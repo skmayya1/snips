@@ -8,6 +8,7 @@ import VideoTrimSlider from "../DualSlider";
 import { parseISODuration } from "@/lib/utils";
 import { RiAiGenerate } from "react-icons/ri";
 import Spinner from "../Spinner";
+import ToolTip from "../ToolTip";
 
 const genreOptions = [
   { value: "auto", label: "Auto" },
@@ -101,7 +102,14 @@ const Editor = () => {
             <div className="space-y-3">
               {/* Genre Selection */}
               <div className="flex flex-col md:flex-row md:items-center gap-3">
-                <label className="text-silver font-medium w-32">Genre:</label>
+                <label className="text-silver font-medium w-32 flex items-center gap-1">
+                  Genre:
+                  <ToolTip 
+                    tooltipContent="Select the type of content to optimize your shorts"
+                  >
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-eerie-black text-xs text-silver ">?</span>
+                  </ToolTip>
+                </label>
                 <div className="flex-grow">
                   <SelectInput
                     label=""
@@ -115,8 +123,13 @@ const Editor = () => {
 
               {/* Aspect Ratio Selection */}
               <div className="flex flex-col md:flex-row md:items-center gap-3">
-                <label className="text-silver font-medium w-32">
+                <label className="text-silver font-medium w-32 flex items-center gap-1">
                   Aspect Ratio:
+                  <ToolTip 
+                    tooltipContent="Choose format: 16:9 (landscape), 1:1 (square), 9:16 (vertical)"
+                  >
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-eerie-black text-xs text-silver ">?</span>
+                  </ToolTip>
                 </label>
                 <div className="flex-grow">
                   <SelectInput
@@ -131,7 +144,14 @@ const Editor = () => {
 
               {/* Clips Length Range */}
               <div className="flex text-silver flex-col md:flex-row md:items-center gap-3">
-                <label className=" font-medium w-32">Clip Length(s):</label>
+                <label className="font-medium min-w-32 flex items-center gap-1">
+                  Clip Length(s):
+                  <ToolTip 
+                    tooltipContent="Set minimum and maximum duration for generated clips in seconds"
+                  >
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-eerie-black text-xs text-silver ">?</span>
+                  </ToolTip>
+                </label>
                 <div className="flex items-center gap-3">
                   <Container className="flex items-center px-1 ">
                     <input
@@ -161,25 +181,37 @@ const Editor = () => {
                     />
                   </Container>
                 </div>
-                <Switch
-                  onCheckedChange={() => {
-                    updateProjectData({
-                      ...ProjectData,
-                      clipLength: {
-                        from:
-                          ProjectData?.clipLength.from !== "auto" ? "auto" : 0,
-                        to: ProjectData?.clipLength.to !== "auto" ? "auto" : 0,
-                      },
-                    });
-                  }}
-                />{" "}
-                Auto
+                <div className="flex items-center gap-1">
+                  <Switch
+                    onCheckedChange={() => {
+                      updateProjectData({
+                        ...ProjectData,
+                        clipLength: {
+                          from:
+                            ProjectData?.clipLength.from !== "auto" ? "auto" : 0,
+                          to: ProjectData?.clipLength.to !== "auto" ? "auto" : 0,
+                        },
+                      });
+                    }}
+                  />
+                  <span className="mr-1">Auto</span>
+                  <ToolTip 
+                    tooltipContent="Let AI determine optimal clip length"
+                  >
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-eerie-black text-xs text-silver ">?</span>
+                  </ToolTip>
+                </div>
               </div>
 
               {/* Keywords */}
               <div className="flex flex-col md:flex-row md:items-center gap-3">
-                <label className="text-silver font-medium w-32">
+                <label className="text-silver font-medium w-32 flex items-center gap-1">
                   Keywords:
+                  <ToolTip 
+                    tooltipContent="Enter relevant terms to help find engaging moments in your video"
+                  >
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-eerie-black text-xs text-silver ">?</span>
+                  </ToolTip>
                 </label>
                 <div className="flex-grow ">
                   <Container className="px-3 py-1 w-full">
@@ -200,8 +232,13 @@ const Editor = () => {
 
               {/* Shorts Count */}
               <div className="flex flex-col md:flex-row md:items-center gap-3">
-                <label className="text-silver font-medium w-32">
+                <label className="text-silver font-medium w-32 flex items-center gap-1">
                   Shorts Count:
+                  <ToolTip 
+                    tooltipContent="Number of short videos to generate from your content"
+                  >
+                    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-eerie-black text-xs text-silver ">?</span>
+                  </ToolTip>
                 </label>
                 <div className="flex items-center">
                   <Container className="flex items-center px-3 py-1">
