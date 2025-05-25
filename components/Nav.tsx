@@ -11,7 +11,7 @@ export const Nav = async () => {
     headers: await headers(),
   });
   return (
-    <nav className="flex items-center justify-between p-4 w-full px-10">
+    <nav className="flex items-center justify-between p-4 w-full px-10 fixed top-0 z-50 ">
       <Container
         // background={true}
         className="flex items-center justify-center gap-2"

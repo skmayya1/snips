@@ -14,8 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
   id            String    @id @default(cuid()) @map("user_id")
   name          String
@@ -27,6 +25,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   projects      Project[]
+
   @@unique([email])
   @@map("user")
 }
@@ -77,8 +76,21 @@ model Verification {
 }
 
 model Project {
-  id  String @id 
-  userId  String
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
-  
+  id        String        @id @default(uuid())
+  slug      String        @unique
+  cover     String
+  title     String
+  userId    String
+  status    ProjectStatus @default(queued)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId   String
+  config    Json // This will store your ProjectDetails object
+  createdAt DateTime      @default(now())
+}
+
+enum ProjectStatus {
+  queued
+  analyzing
+  completed
+  failed
 }

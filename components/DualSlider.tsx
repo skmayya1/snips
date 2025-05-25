@@ -7,6 +7,13 @@ interface VideoTrimProps {
   duration: number; // in seconds
 }
 
+// Format seconds into mm:ss
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 export default function VideoTrimSlider({ duration }: VideoTrimProps) {
   const [range, setRange] = useState<[number, number]>([0, duration]);
   const { ProjectData, updateProjectData } = useNewProject();
@@ -39,30 +46,10 @@ export default function VideoTrimSlider({ duration }: VideoTrimProps) {
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between gap-4">
         <Container>
-          <input
-            type="number"
-            min={0}
-            max={range[1]}
-            value={range[0].toFixed(2)}
-            onChange={(e) => updateRange(0, Number(e.target.value))}
-            className="border-0 outline-0 bg-transparent w-14 text-center appearance-none 
-              [&::-webkit-outer-spin-button]:appearance-none 
-              [&::-webkit-inner-spin-button]:appearance-none 
-              [&::-moz-appearance:textfield]"
-          />
+          <span className="font-mono">{formatTime(range[0])}</span>
         </Container>
         <Container>
-          <input
-            type="number"
-            min={range[0]}
-            max={duration}
-            value={range[1].toFixed(2)}
-            onChange={(e) => updateRange(1, Number(e.target.value))}
-            className="border-0 outline-0 bg-transparent w-14 text-center appearance-none 
-              [&::-webkit-outer-spin-button]:appearance-none 
-              [&::-webkit-inner-spin-button]:appearance-none 
-              [&::-moz-appearance:textfield]"
-          />
+          <span className="font-mono">{formatTime(range[1])}</span>
         </Container>
       </div>
       <Slider

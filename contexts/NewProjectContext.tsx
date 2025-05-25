@@ -28,6 +28,7 @@ interface VideoDetails {
 }
 
 interface ProjectDetails {
+  videoId: string;
   genre: string;
   clipLength: {
     from: number | 'auto';
@@ -58,7 +59,6 @@ export const NewProjectProvider: React.FC<{ children: ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [VideoData, setVideoData] = useState<VideoDetails | null>(null);
   const [ProjectData, setProjectData] = useState<ProjectDetails | null>(null);
-
   const resetProjectData = () => {
     setError(null);
     setVideoSource({ type: null, data: null });
@@ -78,6 +78,7 @@ export const NewProjectProvider: React.FC<{ children: ReactNode }> = ({
             ...(prev?.timeframe || { from: 0, to: 0 }),
             ...data.timeframe,
           },
+          videoId: data.videoId ?? prev?.videoId ?? "",
           genre: data.genre ?? prev?.genre ?? "",
           keywords: data.keywords ?? prev?.keywords ?? "",
           aspectRatio: data.aspectRatio ?? prev?.aspectRatio ?? "16:9",
@@ -98,11 +99,11 @@ export const NewProjectProvider: React.FC<{ children: ReactNode }> = ({
 
   const HandleUpload = async () => {
     const videoId = extractYoutubeVideoId(videoSource.data as string);
+    updateProjectData({ videoId: videoId || "" });
     if (!videoId) {
       setError("Invalid YouTube link");
       return;
     }
-
     setIsLoading(true);
     try {
       const res = await axios.get(`/api/youtube?video=${videoId}`);
@@ -125,9 +126,12 @@ export const NewProjectProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     const response = await axios.post('/api/project/new', data);
-
-    // Optional: handle response
-    console.log("Project created:", response.data);
+    if (response.status === 200) {
+      window.location.reload();
+    } else {  
+      
+    }
+    setIsLoading(false)
   }
 
   const value: NewProjectContextType = {

@@ -18,5 +18,11 @@ export function parseISODuration(iso: string): number {
 
   const [, h, m, s] = match.map(Number);
   const totalSeconds = (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
-  return totalSeconds / 60;
+  return totalSeconds ;
+}
+
+export function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`; // e.g., 2:06
 }

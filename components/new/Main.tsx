@@ -4,10 +4,9 @@ import Editor from "./Editor";
 
 const Main = () => {
   return (
-    <div className="h-full w-full flex flex-col items-center justify-evenly">
+    <div className="h-full w-full flex flex-col items-center justify-center gap-4">
       <Uploader/>
       <Editor/>
-      {/* Sunbmit and other stiffs */}
     </div>
   );
 };
