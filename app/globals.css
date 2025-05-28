@@ -34,14 +34,12 @@ body {
   height: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-eerie-black dark:bg-night rounded-md;
+  @apply bg-transparent dark:bg-transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-night dark:bg-night rounded-md;
+  @apply bg-zinc-800 dark:bg-zinc-800 rounded-md;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-night dark:bg-night;
-}
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

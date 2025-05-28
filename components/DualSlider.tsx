@@ -16,7 +16,7 @@ function formatTime(seconds: number): string {
 
 export default function VideoTrimSlider({ duration }: VideoTrimProps) {
   const [range, setRange] = useState<[number, number]>([0, duration]);
-  const { ProjectData, updateProjectData } = useNewProject();
+  const { ProjectData, updateProjectData ,VideoData } = useNewProject();
 
   const updateRange = (index: 0 | 1, value: number) => {
     let clampedValue = Math.min(Math.max(0, value), duration);
@@ -30,6 +30,17 @@ export default function VideoTrimSlider({ duration }: VideoTrimProps) {
 
     setRange(updated);
   };
+  
+  useEffect(()=>{
+    updateProjectData({
+      ...ProjectData,
+      timeframe:{
+        from:0,
+        to:duration
+      }
+    })
+  },[])
+
 
   // Sync with global context
   useEffect(() => {

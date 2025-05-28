@@ -5,23 +5,26 @@ import React, {
   useState,
   ReactNode,
   useEffect,
+  useCallback,
 } from "react";
 
 interface ProjectContextType {
   Projects: Projects[] | null;
-  IsFetching : boolean
+  IsFetching: boolean;
+  refetchProjects: () => Promise<void>;
 }
 
 interface Projects {
-  id: string,
-  videoId: string,
-  cover:string,
-  status:string
-  title:string,
-  slug: string,
-  createdAt: string
+  id: string;
+  videoId: string;
+  cover: string;
+  status: string;
+  title: string;
+  slug: string;
+  createdAt: string;
 }
 
+const POLLING_INTERVAL = 200000; // 20 seconds in milliseconds
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
@@ -29,16 +32,42 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [Projects, setProjects] = useState<Projects[] | null>(null);
-  const [IsFetching, setIsFetching] = useState(true)
+  const [IsFetching, setIsFetching] = useState(true);
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/project');
+      setProjects(response.data.projects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setIsFetching(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchProjects();
+      timeoutId = setTimeout(poll, POLLING_INTERVAL);
+    };
+
+    poll();
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [fetchProjects]);
+
   const value: ProjectContextType = {
     Projects,
-    IsFetching
+    IsFetching,
+    refetchProjects: fetchProjects,
   };
-  useEffect(() => {
-    axios.get('/api/project')
-    .then((res)=> setProjects(res.data.projects))
-    .finally(()=> setIsFetching(false))
-  },[]);
+
   return (
     <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
   );
@@ -47,7 +76,7 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({
 export const useProject = (): ProjectContextType => {
   const context = useContext(ProjectContext);
   if (context === undefined) {
-    throw new Error("useNewProject must be used within a NewProjectProvider");
+    throw new Error("useProject must be used within a ProjectProvider");
   }
   return context;
 };

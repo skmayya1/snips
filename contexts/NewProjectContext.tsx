@@ -97,6 +97,8 @@ export const NewProjectProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [videoSource]);
 
+
+
   const HandleUpload = async () => {
     const videoId = extractYoutubeVideoId(videoSource.data as string);
     updateProjectData({ videoId: videoId || "" });

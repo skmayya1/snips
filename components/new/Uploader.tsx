@@ -4,11 +4,15 @@ import Container from "../Container";
 import { IoIosLink } from "react-icons/io";
 import { AiOutlineUpload } from "react-icons/ai";
 import { useNewProject } from "@/contexts/NewProjectContext";
+import { RiResetLeftFill } from "react-icons/ri";
 
 const Uploader = () => {
-  const { setVideoSource, VideoData, videoSource } = useNewProject();
+  const { setVideoSource, VideoData, videoSource ,resetProjectData} = useNewProject();
   return (
-    <Container background={false} className="flex flex-col gap-3 py-10 h-fit w-full ">
+    <Container
+      background={false}
+      className="flex flex-col gap-3 py-10 h-fit w-full "
+    >
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full ">
         <Container
           background={VideoData !== null}
@@ -22,10 +26,12 @@ const Uploader = () => {
                 type: "youtube",
               });
             }}
-            disabled={VideoData !== null }
+            disabled={VideoData !== null}
             value={typeof videoSource.data === "string" ? videoSource.data : ""}
             placeholder="Youtube link"
-            className={`outline-0 border-0 w-full text-white-smoke h-fit px-2 py-1 text-md bg-transparent ${VideoData !== null ? 'cursor-not-allowed opacity-60':''}`}
+            className={`outline-0 border-0 w-full text-white-smoke h-fit px-2 py-1 text-md bg-transparent ${
+              VideoData !== null ? "cursor-not-allowed opacity-60" : ""
+            }`}
           />
           <IoIosLink color="gray" />
         </Container>
@@ -36,6 +42,9 @@ const Uploader = () => {
           <AiOutlineUpload size={22} color="gray" />
           Upload from device
         </Container>
+          <button onClick={resetProjectData} className="flex items-center justify-center cursor-pointer p-2 rounded-full hover:bg-eerie-black transition-all duration-200">
+            <RiResetLeftFill color="gray" size={18} />
+          </button>
       </div>
     </Container>
   );

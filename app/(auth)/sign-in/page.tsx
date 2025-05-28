@@ -6,7 +6,7 @@ const page = () => {
     const SignInWithGoogle = async () => {
         await authClient.signIn.social({
             provider:'google' ,
-            callbackURL: '/new',
+            callbackURL: '/project',
         })
     }
   return (

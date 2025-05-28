@@ -1,14 +1,13 @@
 import { useProject } from "@/contexts/ProjectContext";
 import React from "react";
 import { StatusBadge } from "../Status";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 const Projects = () => {
   const { IsFetching, Projects } = useProject();
   console.log(Projects);
 
   const ProjectSkeleton = () => (
-    <div className="relative overflow-hidden rounded-lg bg-eerie-black animate-pulse">
+    <div className="relative overflow-hidden rounded-lg bg-eerie-black animate-pulse ">
       <div className="aspect-video w-full bg-eerie-black"></div>
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-eerie-black/80 to-transparent p-4">
         <div className="h-4 bg-eerie-black rounded w-3/4"></div>
@@ -26,12 +25,12 @@ const Projects = () => {
   );
 
   return (
-    <div className="h-full MAX_WIDTH">
-      <div className="w-full h-fit">
+    <div className="h-full  MAX_WIDTH pb-10">
+      <div className="w-full h-full">
         <span className="font-semibold text-sm text-white-smoke">
           Projects
         </span>
-        <div className="mt-4">
+        <div className="mt-4 max-h-[calc(60vh-10rem)] h-full overflow-y-auto custom-scrollbar px-2">
           {IsFetching ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, index) => (
