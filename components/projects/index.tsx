@@ -1,9 +1,11 @@
 import { useProject } from "@/contexts/ProjectContext";
 import React from "react";
 import { StatusBadge } from "../Status";
+import { useRouter } from "next/navigation";
 
 const Projects = () => {
   const { IsFetching, Projects } = useProject();
+  const router = useRouter()
   console.log(Projects);
 
   const ProjectSkeleton = () => (
@@ -40,20 +42,22 @@ const Projects = () => {
           ) : Projects && Projects.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Projects.map((project, index) => (
-                <div
+                <div onClick={()=> router.push(`/project/${project.slug}`)}
                   key={index}
                   className="relative overflow-hidden rounded-lg hover:rounded-none transition-all group ease-in-out duration-300 cursor-pointer"
                 >
                   <div className="absolute top-0 right-0 m-2 z-10">
-                    <StatusBadge
-                      status={
-                        project.status as
-                          | "queued"
-                          | "analyzing"
-                          | "completed"
-                          | "failed"
-                      }
-                    />
+                     {project.status !== 'completed' && (
+                      <StatusBadge
+                        status={
+                          project.status as
+                            | "queued"
+                            | "analyzing"
+                            | "completed"
+                            | "failed"
+                        }
+                      />
+                     )}
                   </div>
                   <img
                     src={project.cover}

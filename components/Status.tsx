@@ -13,8 +13,8 @@ const statusStyles = {
   },
   completed: {
     color: "bg-transparent ",
-    icon: '',
-    label: "",
+    icon: <CheckCircle className="w-4 h-4 text-green-600" />,
+    label: "Completed",
   },
   failed: {
     color: "bg-red-100 text-red-800",
