@@ -1,18 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Project, Short } from '@/lib/generated/prisma'
 import axios from 'axios'
 import Image from 'next/image';
 import { StatusBadge } from '@/components/Status';
+import Shorts from '@/components/shorts';
+import { FaArrowLeftLong } from "react-icons/fa6";
 
 interface ProjectResponse extends Project {
     shorts: Short[]
+    config: {
+        aspectRatio: string
+    }
 }
 
 const ProjectPage = () => {
     const params = useParams()
+    const router = useRouter()
     const [project, setProject] = useState<ProjectResponse | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -37,7 +43,7 @@ const ProjectPage = () => {
 
         fetchProject()
     }, [params.slug])
-    
+
     if (isLoading) {
         return <div className="flex items-center justify-center min-h-screen">Loading...</div>
     }
@@ -49,79 +55,48 @@ const ProjectPage = () => {
     if (!project) {
         return <div className="text-center min-h-screen flex items-center justify-center">Project not found</div>
     }
-    
+
     return (
-        <div className='min-h-screen p-6 max-w-7xl mx-auto'>
-            {/* Project Header */}
-            <div className='mb-8'>
-                <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
-                <div className="flex items-center gap-4 text-gray-600">
-                    <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
-                    <StatusBadge status={project.status}/>
-                </div>
-            </div>
-
+        <div className='min-h-screen p-6 max-w-7xl mx-auto h-full'>
+            <div onClick={()=> router.push('/project')} className="flex items-center gap-2 text-silver text-sm cursor-pointer"><FaArrowLeftLong/> back</div>
             {/* Project Cover and Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div className="md:col-span-2">
-                    <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
-                        <Image 
-                            src={project.cover} 
-                            alt={project.title} 
-                            width={1200} 
-                            height={675} 
-                            className='object-cover w-full h-full'
-                        />
-                    </div>
+            <div className="flex items-start justify-start w-full h-[33%] border-b border-silver/30 py-7 gap-10">
+                <div className="aspect-video w-full max-w-md relative rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer group">
+                    {/* Main thumbnail image */}
+                    <Image
+                        src={project.cover}
+                        alt={project.title}
+                        width={1280}
+                        height={720}
+                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        priority
+                        quality={90}
+                        sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 448px"
+                    />
                 </div>
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                    <h2 className="text-xl font-semibold mb-4">Project Details</h2>
-                    <div className="space-y-4">
-                        <div>
-                            <p className="text-sm text-gray-500">Video ID</p>
-                            <p className="font-medium">{project.videoId}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">Slug</p>
-                            <p className="font-medium">{project.slug}</p>
+                <div className="flex flex-col justify-between items-start h-full">
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
+                        <div className="flex items-center gap-4 font-thin text-sm text-silver">
+                            <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
+                            <StatusBadge status={project.status} />
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Shorts Section */}
-            <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-6">Generated Shorts</h2>
-                {project.shorts.length === 0 ? (
-                    <p className="text-gray-500">No shorts generated yet</p>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {project.shorts.map((short) => (
-                            <div key={short.id} className="bg-white rounded-lg overflow-hidden shadow-md">
-                                <div className="aspect-video relative">
-                                    <Image
-                                        src={project.cover}
-                                        alt={`Short ${short.id}`}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div className="p-4">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm text-gray-500">
-                                            {new Date(short.createdAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-gray-600 line-clamp-2">{short.highlightText}</p>
-                                    <div className="mt-2 text-xs text-gray-500">
-                                        <span>From: {short.from}s - To: {short.to}s</span>
-                                    </div>
+                    {
+                        project.status === 'completed' && (
+                            <div className="flex items-center gap-4">
+                                <div className="text-lg font-normal text-timberwolf/90 ">{project.shorts.length} {project.shorts.length === 1 ? 'Short' : 'Shorts'} generated</div>
+                                <div className="">
+                                    <button className="w-full bg-[#FF9505]/90 cursor-pointer text-night font-semibold py-2.5 rounded-lg flex items-center justify-center gap-1 px-10">
+                                        Download All
+                                    </button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        )
+                    }
+                </div>
             </div>
+            <Shorts shorts={project.shorts} aspectRatio={project.config?.aspectRatio as string} />
         </div>
     )
 }

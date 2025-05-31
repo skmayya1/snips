@@ -19,6 +19,8 @@ export async function POST (req:NextRequest){
     }
     const email = session.user.email
     const ProjectConfig : ProjectDetails = await req.json()
+    console.log("ProjectConfig", ProjectConfig);
+    
     const slug = ProjectConfig.videoId + "-" + Date.now() + session.user.id
 
     const { id } = await prisma.project.create({
@@ -29,6 +31,7 @@ export async function POST (req:NextRequest){
         title:ProjectConfig.title,
         cover:ProjectConfig.thumbnail,
         status:'queued',
+        
         user: {
           connect:{
             email
@@ -40,9 +43,21 @@ export async function POST (req:NextRequest){
       videoId:ProjectConfig.videoId,
       timeframe: ProjectConfig.timeframe,
       requestedAt: new Date().toISOString(),
-      projectId:id
+      projectId:id,
+      aspectRatio:ProjectConfig.aspectRatio
     };
-    await redis.rpush("download_queue", JSON.stringify(job));
+    try {
+      await redis.rpush("download_queue", JSON.stringify(job));
+    } catch (error) {
+      await prisma.project.update({
+        where:{
+          id
+        },
+        data:{
+          status:"failed"
+        }
+      })
+    }
     return new Response(JSON.stringify({message:"ok"}),{
         status: 200,
     })

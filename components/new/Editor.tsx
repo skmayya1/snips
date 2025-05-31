@@ -184,6 +184,17 @@ const Editor = () => {
                         min={0}
                         max={180}
                         placeholder="0"
+                        onChange={(e)=>{
+                          updateProjectData({
+                            ...ProjectData,
+                            clipLength: {
+                              from: parseInt(
+                                (e.target as HTMLInputElement).value
+                              ) || ProjectData?.clipLength?.from || 0,
+                              to: ProjectData?.clipLength?.to || 0
+                            },
+                          });
+                        }}
                         disabled={ProjectData?.clipLength.from == "auto"}
                         className="border-0 outline-0 bg-transparent w-8 text-center appearance-none 
                       [&::-webkit-outer-spin-button]:appearance-none 
@@ -199,6 +210,17 @@ const Editor = () => {
                         min={0}
                         max={180}
                         placeholder="30"
+                        onChange={(e)=>{
+                          updateProjectData({
+                            ...ProjectData,
+                            clipLength: {
+                              from: ProjectData?.clipLength?.from || 0,
+                              to: parseInt(
+                                (e.target as HTMLInputElement).value
+                              ) || ProjectData?.clipLength?.to || 0
+                            },
+                          });
+                        }}
                         className="border-0 outline-0 bg-transparent w-8 text-center appearance-none 
                       [&::-webkit-outer-spin-button]:appearance-none 
                       [&::-webkit-inner-spin-button]:appearance-none 
@@ -274,6 +296,12 @@ const Editor = () => {
                     <Container className="flex items-center px-3 py-1">
                       <input
                         type="number"
+                        onChange={(e)=>{
+                          updateProjectData({
+                            ...ProjectData,
+                            shortsCount: parseInt(e.target.value) || 0
+                          })
+                        }}
                         min={0}
                         max={30}
                         placeholder="0"
