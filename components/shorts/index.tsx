@@ -3,9 +3,6 @@ import React from 'react'
 import Options from './Options'
 
 const Shorts = ({ shorts, aspectRatio = '9:16' }: { shorts: Short[], aspectRatio: string }) => {
-    // console.log(shorts[0].url); // Good for debugging
-    // console.log(aspectRatio); // Good for debugging
-
     return (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-fit py-5'>
             {shorts.map((short) => (
@@ -22,7 +19,7 @@ const Shorts = ({ shorts, aspectRatio = '9:16' }: { shorts: Short[], aspectRatio
                             </video>
 
                             <div className="absolute top-1/2 left-25 hidden group-hover:block z-10">
-                                <Options />
+                                <Options id={short.id}/>
                             </div>
                         </div>
 
