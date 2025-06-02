@@ -7,6 +7,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect, useRe
 interface Projects extends Project {
     config: {
         duration: number
+        aspectRatio: '16:9' | '9:16' | '1:1'
     }
 }
 
@@ -21,6 +22,8 @@ interface ShortEditorContextType {
   setCurrentShort: (short: Short | null) => void;
   setCurrentProject: (project: Projects | null) => void;
   updateShortTrim: (from: number, to: number) => void;
+  toggleValue: string;
+  setToggleValue: (value: string) => void;
 }
 
 const ShortEditorContext = createContext<ShortEditorContextType | undefined>(undefined);
@@ -45,6 +48,7 @@ export function ShortEditorProvider({ children }: { children: ReactNode }) {
   const [currentShort, setCurrentShort] = useState<Short | null>(null);
   const [currentProject, setCurrentProject] = useState<Projects | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [toggleValue, setToggleValue] = useState("generated");
   const params = useSearchParams()
   const id = params.get('id')
 
@@ -84,6 +88,8 @@ export function ShortEditorProvider({ children }: { children: ReactNode }) {
         setCurrentShort,
         setCurrentProject,
         updateShortTrim,
+        toggleValue,
+        setToggleValue,
       }}
     >
       {children}
