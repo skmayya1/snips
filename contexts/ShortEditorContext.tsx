@@ -66,10 +66,6 @@ export function ShortEditorProvider({ children }: { children: ReactNode }) {
     fetchProject();
   }, [id])
 
-
-
-
-
   const updateShortTrim = (from: number, to: number) => {
     if (currentShort) {
       setCurrentShort({
