@@ -7,6 +7,7 @@ import { RiSave3Line, RiArrowGoBackLine } from 'react-icons/ri';
 import Container from '../Container';
 import ToolTip from '../ToolTip';
 import SelectInput from '../DropDown';
+import axios from 'axios';
 
 const aspectOptions = [
   { value: "16:9", label: "16:9" },
@@ -33,7 +34,7 @@ const Player = () => {
     const [dragStartX, setDragStartX] = useState(0);
     const [dragStartValue, setDragStartValue] = useState(0);
     
-    const [selectedAspectRatio, setSelectedAspectRatio] = useState(currentProject?.config.aspectRatio || "16:9");
+    const [selectedAspectRatio, setSelectedAspectRatio] = useState(currentProject?.config.aspectRatio);
     const [history, setHistory] = useState<ShortHistory[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -45,7 +46,7 @@ const Player = () => {
             setHistory([{
                 from: currentShort.from,
                 to: currentShort.to,
-                aspectRatio: selectedAspectRatio,
+                aspectRatio: selectedAspectRatio as string,
             }]);
         }
     }, [currentShort]);
@@ -214,26 +215,34 @@ const Player = () => {
     };
 
     const handleSave = () => {
-        if (currentShort) {
-            // Add current state to history for undo
-            setHistory(prev => [...prev, {
-                from: currentShort.from,
-                to: currentShort.to,
-                aspectRatio: selectedAspectRatio,
-            }]);
-            
-            // Here you would typically save to your backend
-            // await saveShortChanges(currentShort.id, { from, to, aspectRatio });
-            
+        if (!currentShort || !currentProject?.pubId) return;
+    
+        const clampedFrom = Math.max(0, Math.min(currentShort.from, currentShort.to - 0.1));
+        const clampedTo = Math.min(duration, Math.max(currentShort.to, currentShort.from + 0.1));
+    
+        setHistory(prev => [...prev, {
+            from: clampedFrom,
+            to: clampedTo,
+            aspectRatio: selectedAspectRatio as string,
+        }]);
+    
+        axios.put(`/api/short/${currentShort.id}`, {
+            from: clampedFrom,
+            to: clampedTo,
+            pubId: currentProject.pubId,
+            aspectRatio: selectedAspectRatio
+        }).then(() => {
             setHasUnsavedChanges(false);
             console.log('Saved changes:', {
-                from: currentShort.from,
-                to: currentShort.to,
+                from: clampedFrom,
+                to: clampedTo,
                 aspectRatio: selectedAspectRatio,
             });
-        }
+        }).catch(err => {
+            console.error("Failed to save short:", err);
+        });
     };
-
+    
     const handleUndo = () => {
         if (history.length > 1 && currentShort && setCurrentShort) {
             const previousState = history[history.length - 2];
@@ -252,11 +261,11 @@ const Player = () => {
 
     const getVideoContainerStyle = () => {
         if (isShorts) {
-            return 'aspect-[9/16] max-h-[70vh] w-auto max-w-[40vh]';
+            return 'w-[320px] h-[568px]'; // Fixed size for 9:16 ratio
         } else if (isSquare) {
-            return 'aspect-square max-h-[60vh] max-w-[60vh]';
+            return 'w-[480px] h-[480px]'; // Fixed size for 1:1 ratio
         } else {
-            return 'aspect-video max-h-[50vh] w-full max-w-[80vh]';
+            return 'w-[640px] h-[360px]'; // Fixed size for 16:9 ratio
         }
     };
 
@@ -276,9 +285,7 @@ const Player = () => {
         <div className="w-full h-full flex gap-4 items-center justify-center">
             {/* Video Player - Main Content */}
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                <div className="">
-                    <h1>{currentShort?.title}</h1>
-                </div>
+
                 <div className={`relative bg-black rounded-2xl overflow-hidden ${getVideoContainerStyle()}`}>
                     <video
                         ref={videoRef}
@@ -311,9 +318,32 @@ const Player = () => {
 
                 {/* Timeline Controls */}
                 <div className="w-full max-w-3xl flex flex-col gap-2">
-                    <div className="flex justify-between text-sm text-white">
+                    <div className="flex justify-between text-sm text-white relative">
                         <span>{formatTime(currentTime)}</span>
                         <span>{formatTime(duration)}</span>
+                        <div
+                        className="absolute top-0 left-0 h-full w-full flex items-center justify-end transition-all duration-200 ease-in-out rounded-l-2xl"
+                        style={{
+                            width: `${from}%`
+                        }}
+                    >
+                        <div className="h-full w-full justify-end flex items-center text-xs text-zinc-400" >
+                        <span className='px-2 py-1 bg-black rounded-full'>
+                           {(from / 60).toFixed(2)}
+                           </span>                        </div>
+                    </div>
+                    <div
+                        className="absolute top-0 right-0 h-full w-full flex items-center justify-end transition-all duration-200 ease-in-out  "
+                        style={{
+                            width: `${100 - to}%`
+                        }}
+                    >
+                    <div className="h-full w-full justify-start flex items-center text-xs text-zinc-400" >
+                           <span className='px-2 py-1 bg-black rounded-full z-0'>
+                           {(to / 60).toFixed(2)}
+                           </span>
+                        </div>
+                    </div>
                     </div>
                     <div 
                         ref={progressBarRef}
@@ -348,7 +378,7 @@ const Player = () => {
                             />
                         </div>
                         <div
-                            className="absolute top-0 right-0 h-full w-full flex items-center justify-end transition-all duration-200 ease-in-out "
+                            className="absolute top-0 right-0 h-full w-full flex items-center justify-end transition-all duration-200 ease-in-out z-10"
                             style={{
                                 width: `${100 - to}%`
                             }}
@@ -364,8 +394,11 @@ const Player = () => {
                     </div>
                 </div>
             </div>
-
-            <div className="w-[25%] h-fit flex flex-col items-center justify-center">
+    
+            <div className="w-[25%] h-fit flex flex-col items-center justify-center gap-2">
+            <div className="w-full flex px-1 line-clamp-2 flex-nowrap ">
+                    <h1>{currentShort?.title}</h1>
+                </div>
                 <Container background={false} border className="p-4 py-6 rounded-lg w-full flex flex-col gap-6 h-fit ">
                     {/* Aspect Ratio Controls */}
                     <div className="flex flex-col gap-3">
